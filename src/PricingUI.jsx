@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 function PricingUI() {
-  const API = "https://hreadycab-caluclation-test-production.up.railway.app";
+  const API = "https://readycab-caluclation-test-production.up.railway.app";
   const [distance, setDistance] = useState(0);
   const [applySurcharge, setApplySurcharge] = useState(false);
   const [applyAc, setApplyAc] = useState(false);
