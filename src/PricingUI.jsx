@@ -77,18 +77,30 @@ function PricingUI() {
             <label style={{ display: "block", fontSize: "12px", color: "#9ca3af" }}>
               Enter Distance (km)
             </label>
-            <input
-              type="number"
-              value={distance}
-              onChange={e => setDistance(e.target.value)}
-              style={{
-                padding: "6px 8px",
-                borderRadius: "6px",
-                border: "1px solid #374151",
-                background: "#020617",
-                color: "#e5e7eb"
-              }}
-            />
+  <input
+  type="text"
+  value={distance}
+  onChange={e => {
+    const value = e.target.value;
+
+    // Allow only numbers with up to 2 decimal places
+    const regex = /^\d*\.?\d{0,2}$/;
+
+    if (value === "" || regex.test(value)) {
+      setDistance(value);
+    }
+  }}
+  style={{
+    padding: "6px 8px",
+    borderRadius: "6px",
+    border: "1px solid #374151",
+    background: "#020617",
+    color: "#e5e7eb"
+  }}
+/>
+
+
+
           </div>
 
           {/* APPLY SURCHARGE SLIDER */}
@@ -182,20 +194,20 @@ function PricingUI() {
       {result && (
         <div style={cardStyle}>
           <h3>Total Trip Price to be Paid by Customer</h3>
-          <h1 style={{ color: accent }}>₹ {result.total_trip_price_to_be_paid_by_customer}</h1>
+          <h1 style={{ color: accent }}>₹ {result.total_trip_price_to_be_paid_by_customer.toFixed(2)}</h1>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
             <div style={{ background: "#020617", padding: "12px", borderRadius: "10px", border: "1px solid #1f2937" }}>
               <div style={{ fontSize: "12px", color: "#9ca3af" }}>App Earning (Subtotal)</div>
               <div style={{ fontSize: "18px", fontWeight: 600, textAlign: "right", color: accent }}>
-                ₹ {result.basic_app_earning}
+                ₹ {result.basic_app_earning.toFixed(2)}
               </div>
             </div>
 
             <div style={{ background: "#020617", padding: "12px", borderRadius: "10px", border: "1px solid #1f2937" }}>
               <div style={{ fontSize: "12px", color: "#9ca3af" }}>Driver Earning (Subtotal)</div>
               <div style={{ fontSize: "18px", fontWeight: 600, textAlign: "right", color: accent }}>
-                ₹ {result.basic_driver_earning}
+                ₹ {result.basic_driver_earning.toFixed(2)}
               </div>
             </div>
           </div>
@@ -218,22 +230,23 @@ function PricingUI() {
                 </tr>
               </thead>
               <tbody>
-                <Row i={0} t="Base Fee" p={result.base_fare} />
-                <Row i={1} t="Charges for km" p={result.charges_per_km} />
-                <Row i={2} t="Surcharge" p={result.surcharge} />
-                <Row i={3} t="Platform fee" p={result.platform_fee} a={result.platform_fee} />
-                <Row i={4} t="Infrastructure fee" p={result.infrastructure_fee} a={result.infrastructure_fee} />
-                <Row i={5} t="Basic Trip amount" p={result.basic_trip_amount} />
-                <Row i={6} t="Insurance fee" p={result.insurance_fee} a={result.insurance_fee} />
-                <Row i={7} t="City fee" p={result.city_fee} a={result.city_fee} />
-                <Row i={8} t="GST for Driver" p={result.gst_for_driver} d={result.gst_for_driver} />
-                <Row i={9} t="GST for App" p={result.gst_for_app} a={result.gst_for_app} />
+                <Row i={0} t="Base Fee" p={result.base_fare.toFixed(2)} />
+                <Row i={1} t="Charges for km" p={result.charges_per_km.toFixed(2)} />
+                <Row i={2} t="Ac Charges" p={result.ac_price.toFixed(2)} />
+                <Row i={3} t="Surcharge" p={result.surcharge.toFixed(2)} />
+                <Row i={4} t="Platform fee" p={result.platform_fee.toFixed(2)} a={result.platform_fee.toFixed(2)} />
+                <Row i={5} t="Infrastructure fee" p={result.infrastructure_fee.toFixed(2)} a={result.infrastructure_fee.toFixed(2)} />
+                <Row i={6} t="Basic Trip amount" p={result.basic_trip_amount.toFixed(2)} />
+                <Row i={7} t="Insurance fee" p={result.insurance_fee.toFixed(2)} a={result.insurance_fee.toFixed(2)} />
+                <Row i={8} t="City fee" p={result.city_fee.toFixed(2)} a={result.city_fee.toFixed(2)} />
+                <Row i={9} t="GST for Driver" p={result.gst_for_driver.toFixed(2)} d={result.gst_for_driver.toFixed(2)} />
+                <Row i={10} t="GST for App" p={result.gst_for_app.toFixed(2)} a={result.gst_for_app.toFixed(2)} />
 
                 <tr style={{ fontWeight: "bold", background: "#020617" }}>
                   <td style={td}>Total Trip Price</td>
-                  <td style={tdRight}>₹ {result.total_trip_price_to_be_paid_by_customer}</td>
-                  <td style={tdRight}>₹ {result.total_trip_price_to_be_paid_by_customer_app_payment}</td>
-                  <td style={tdRight}>₹ {result.total_trip_price_to_be_paid_by_customer_driver_payment}</td>
+                  <td style={tdRight}>₹ {result.total_trip_price_to_be_paid_by_customer.toFixed(2)}</td>
+                  <td style={tdRight}>₹ {result.total_trip_price_to_be_paid_by_customer_app_payment.toFixed(2)}</td>
+                  <td style={tdRight}>₹ {result.total_trip_price_to_be_paid_by_customer_driver_payment.toFixed(2)}</td>
                 </tr>
               </tbody>
             </table>
@@ -245,5 +258,6 @@ function PricingUI() {
 }
 
 export default PricingUI;
+
 
 
