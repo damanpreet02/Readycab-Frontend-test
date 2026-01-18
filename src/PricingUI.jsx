@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 function PricingUI() {
+  const API = "https://hreadycab-caluclation-test-production.up.railway.app";
   const [distance, setDistance] = useState(0);
   const [applySurcharge, setApplySurcharge] = useState(false);
   const [applyAc, setApplyAc] = useState(false);
@@ -44,7 +45,7 @@ function PricingUI() {
   const fetchPricing = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/pricing', {
+      const response = await fetch(`${API}/api/pricing`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
