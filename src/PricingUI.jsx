@@ -284,6 +284,25 @@ useEffect(() => {
                 ₹ {result.basic_driver_earning.toFixed(2)}
               </div>
             </div>
+
+            <div style={{
+              background: "#020617",
+              padding: "12px",
+              borderRadius: "10px",
+              border: "1px solid #1f2937"
+            }}>
+              <div style={{ fontSize: "12px", color: "#9ca3af" }}>
+                Total GST
+              </div>
+              <div style={{
+                fontSize: "18px",
+                fontWeight: 600,
+                textAlign: "right",
+                color: accent
+              }}>
+                ₹ {(result.gst_for_app + result.gst_for_driver).toFixed(2)}
+              </div>
+            </div>
           </div>
 
           <button
