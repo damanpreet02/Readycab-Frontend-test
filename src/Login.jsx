@@ -11,7 +11,7 @@ export default function Login({ onLoginSuccess }) {
   e.preventDefault();
 
   try {
-    const BASE_URL = process.env.production.REACT_APP_API_URL;
+    const BASE_URL = process.env.REACT_APP_API_URL;
 
 const res = await axios.post(
   `${BASE_URL}/api/auth/login`,
