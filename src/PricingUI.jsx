@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 function PricingUI() {
-  const API = "https://readycab-caluclation-test-production.up.railway.app";
+  const API = process.env.REACT_APP_API_URL;
+
 
   const [distance, setDistance] = useState(0);
   const [applySurcharge, setApplySurcharge] = useState(false);
@@ -55,33 +56,41 @@ useEffect(() => {
   const tdRight = { ...td, textAlign: "right" };
 
   const Row = ({ i, t, p, d, a }) => (
-    <tr style={{ background: i % 2 === 0 ? "#020617" : "#0f172a" }}>
-      <td style={td}>{t}</td>
-      <td style={tdRight}>₹ {p}</td>
-      <td style={tdRight}>{a ? `₹ ${a}` : ''}</td>
-      <td style={tdRight}>{d ? `₹ ${d}` : ''}</td>
-    </tr>
-  );
+  <tr style={{ background: i % 2 === 0 ? "#020617" : "#0f172a" }}>
+    <td style={td}>{t}</td>
+    <td style={tdRight}>₹ {p ?? "0.00"}</td>
+    <td style={tdRight}>{a ? `₹ ${a}` : ""}</td>
+    <td style={tdRight}>{d ? `₹ ${d}` : ""}</td>
+  </tr>
+);
 
-  const fetchPricing = async () => {
+
+  const fetchPricing  = async () => {
+  try {
     setLoading(true);
-    try {
-      const response = await fetch(`${API}/api/pricing`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          vehicle_id: "689b2ef954f6141162c53b74",
-          distance: parseFloat(distance),
-          applySurcharge,
-          applyAc
-        })
-      });
+    const response = await fetch(`${API}/api/pricing`, {
+      method: "POST",
+      headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("token")}`
+    },
+      body: JSON.stringify({
+        vehicle_id: "689b2ef954f6141162c53b74",
+        distance: parseFloat(distance),
+        applySurcharge,
+        applyAc
+      })
+    });
 
-      const data = await response.json();
-      setResult(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
+    const data = await response.json();
+
+    console.log("Pricing result:", data);
+
+    setResult(data);   // ✅ THIS is where you set response
+
+  } catch (err) {
+    console.error("Pricing error:", err);
+  } finally {
       setLoading(false);
     }
   };
@@ -237,7 +246,7 @@ useEffect(() => {
         <div style={cardStyle}>
           <h3>Total Trip Price to be Paid by Customer</h3>
           <h1 style={{ color: accent }}>
-            ₹ {result.total_trip_price_to_be_paid_by_customer.toFixed(2)}
+            ₹ {result?.total_trip_price_to_be_paid_by_customer?.toFixed(2) || "0.00"}
           </h1>
 
           <div style={{
@@ -262,7 +271,7 @@ useEffect(() => {
                 textAlign: "right",
                 color: accent
               }}>
-                ₹ {result.basic_app_earning.toFixed(2)}
+                ₹ {result?.basic_app_earning?.toFixed(2) || "0.00"}
               </div>
             </div>
 
@@ -281,7 +290,7 @@ useEffect(() => {
                 textAlign: "right",
                 color: accent
               }}>
-                ₹ {result.basic_driver_earning.toFixed(2)}
+                ₹ {result?.basic_driver_earning?.toFixed(2) || "0.00"}
               </div>
             </div>
 
@@ -300,7 +309,7 @@ useEffect(() => {
                 textAlign: "right",
                 color: accent
               }}>
-                ₹ {(result.gst_for_app + result.gst_for_driver).toFixed(2)}
+                ₹ {(result?.gst_for_app + result?.gst_for_driver).toFixed(2) || "0.00"}
               </div>
             </div>
           </div>
@@ -331,28 +340,28 @@ useEffect(() => {
                   </tr>
                 </thead>
                 <tbody>
-                  <Row i={0} t="Base Fee" p={result.base_fare.toFixed(2)} />
-                  <Row i={1} t="Charges for km" p={result.charges_per_km.toFixed(2)} />
-                  <Row i={2} t="Ac Charges" p={result.ac_price.toFixed(2)} />
-                  <Row i={3} t="Surcharge" p={result.surcharge.toFixed(2)} />
-                  <Row i={4} t="Platform fee" p={result.platform_fee.toFixed(2)} a={result.platform_fee.toFixed(2)} />
-                  <Row i={5} t="Infrastructure fee" p={result.infrastructure_fee.toFixed(2)} a={result.infrastructure_fee.toFixed(2)} />
-                  <Row i={6} t="Basic Trip amount" p={result.basic_trip_amount.toFixed(2)} />
-                  <Row i={7} t="Insurance fee" p={result.insurance_fee.toFixed(2)} a={result.insurance_fee.toFixed(2)} />
-                  <Row i={8} t="City fee" p={result.city_fee.toFixed(2)} a={result.city_fee.toFixed(2)} />
-                  <Row i={9} t="GST for Driver" p={result.gst_for_driver.toFixed(2)} d={result.gst_for_driver.toFixed(2)} />
-                  <Row i={10} t="GST for App" p={result.gst_for_app.toFixed(2)} a={result.gst_for_app.toFixed(2)} />
+                  <Row i={0} t="Base Fee" p={result?.base_fare?.toFixed(2) || "0.00"}  />
+                  <Row i={1} t="Charges for km" p={result?.charges_per_km?.toFixed(2) || "0.00"} />
+                  <Row i={2} t="Ac Charges" p={result?.ac_price?.toFixed(2) || "0.00"} />
+                  <Row i={3} t="Surcharge" p={result?.surcharge?.toFixed(2) || "0.00"} />
+                  <Row i={4} t="Platform fee" p={result?.platform_fee?.toFixed(2) || "0.00"} a={result?.platform_fee?.toFixed(2) || "0.00"} />
+                  <Row i={5} t="Infrastructure fee" p={result?.infrastructure_fee?.toFixed(2) || "0.00"} a={result?.infrastructure_fee?.toFixed(2) || "0.00"} />
+                  <Row i={6} t="Basic Trip amount" p={result?.basic_trip_amount?.toFixed(2) || "0.00"} />
+                  <Row i={7} t="Insurance fee" p={result?.insurance_fee?.toFixed(2) || "0.00"} a={result?.insurance_fee?.toFixed(2) || "0.00"} />
+                  <Row i={8} t="City fee" p={result?.city_fee?.toFixed(2) || "0.00"} a={result?.city_fee?.toFixed(2) || "0.00"} />
+                  <Row i={9} t="GST for Driver" p={result?.gst_for_driver?.toFixed(2) || "0.00"} d={result?.gst_for_driver?.toFixed(2) || "0.00"} />
+                  <Row i={10} t="GST for App" p={result?.gst_for_app?.toFixed(2) || "0.00"} a={result?.gst_for_app?.toFixed(2) || "0.00"} />
 
                   <tr style={{ fontWeight: "bold", background: "#020617" }}>
                     <td style={td}>Total Trip Price</td>
                     <td style={tdRight}>
-                      ₹ {result.total_trip_price_to_be_paid_by_customer.toFixed(2)}
+                      ₹ {result?.total_trip_price_to_be_paid_by_customer?.toFixed(2) || "0.00"}
                     </td>
                     <td style={tdRight}>
-                      ₹ {result.total_trip_price_to_be_paid_by_customer_app_payment.toFixed(2)}
+                      ₹ {result?.total_trip_price_to_be_paid_by_customer_app_payment?.toFixed(2) || "0.00"}
                     </td>
                     <td style={tdRight}>
-                      ₹ {result.total_trip_price_to_be_paid_by_customer_driver_payment.toFixed(2)}
+                      ₹ {result?.total_trip_price_to_be_paid_by_customer_driver_payment?.toFixed(2) || "0.00"}
                     </td>
                   </tr>
                 </tbody>
