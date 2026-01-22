@@ -7,11 +7,12 @@ export default function App() {
 
   return (
     <>
-      {isLoggedIn ? (
-        <PricingUI />
-      ) : (
+      {!isLoggedIn && (
         <Login onLoginSuccess={() => setIsLoggedIn(true)} />
       )}
+
+      {isLoggedIn && <PricingUI />}
     </>
   );
 }
+  

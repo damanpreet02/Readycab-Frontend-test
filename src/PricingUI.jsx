@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 function PricingUI() {
   const API = process.env.REACT_APP_API_URL;
 
-
   const [distance, setDistance] = useState(0);
   const [applySurcharge, setApplySurcharge] = useState(false);
   const [applyAc, setApplyAc] = useState(false);
@@ -11,6 +10,29 @@ function PricingUI() {
   const [result, setResult] = useState(null);
   const [showBreakdown, setShowBreakdown] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [vehicles, setVehicles] = useState([]);
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [vehicleLoading, setVehicleLoading] = useState(true);
+
+  useEffect(() => {
+  fetch(`${API}/api/vehicles/active`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  })
+    .then(res => res.json())
+    .then(resData => {
+      if (Array.isArray(resData.data)) {
+        setVehicles(resData.data);
+      } else {
+        setVehicles([]);
+      }
+    })
+    .catch(err => console.error("Vehicle fetch error:", err))
+    .finally(() => setVehicleLoading(false));
+}, [API]);
+
+
 
 useEffect(() => {
   const checkMobile = () => {
@@ -75,7 +97,7 @@ useEffect(() => {
       "Authorization": `Bearer ${localStorage.getItem("token")}`
     },
       body: JSON.stringify({
-        vehicle_id: "689b2ef954f6141162c53b74",
+        vehicle_id: selectedVehicle?.id,
         distance: parseFloat(distance),
         applySurcharge,
         applyAc
@@ -102,7 +124,10 @@ useEffect(() => {
       color: "#e5e7eb",
       minHeight: "100vh"
     }}>
-      <h1 style={{ color: accent }}>ReadyCab Pricing Calculator</h1>
+      <h1 style={{ color: accent }}>
+  {selectedVehicle?.name || "ReadyCab"} Pricing Calculator
+</h1>
+
 
       <div style={{
         background: "#0f172a",
@@ -119,6 +144,45 @@ useEffect(() => {
           flexDirection: isMobile ? "column" : "row",
           width: "100%"
         }}>
+
+          {/* Vehicle Dropdown */}
+<div style={{ width: isMobile ? "100%" : "220px" }}>
+  <label style={{ display: "block", fontSize: "12px", color: "#9ca3af" }}>
+    Select Vehicle
+  </label>
+
+  <select
+    value={selectedVehicle?.id || ""}
+    onChange={e => {
+      const v = vehicles.find(x => x._id === e.target.value);
+      if (!v) return;
+
+      setSelectedVehicle({
+        id: v._id,
+        name: v.vehicle_type
+      });
+    }}
+    style={{
+      padding: "8px",
+      borderRadius: "6px",
+      border: "1px solid #374151",
+      background: "#020617",
+      color: "#e5e7eb",
+      width: "100%"
+    }}
+  >
+    <option value="">
+      {vehicleLoading ? "Loading vehicles..." : "-- Select Vehicle --"}
+    </option>
+
+    {vehicles.map(v => (
+      <option key={v._id} value={v._id}>
+        {v.vehicle_type}
+      </option>
+    ))}
+  </select>
+</div>
+
 
           {/* Distance Input */}
           <div style={{ width: isMobile ? "90%" : "auto" }}>
