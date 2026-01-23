@@ -14,6 +14,8 @@ function PricingUI() {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [vehicleLoading, setVehicleLoading] = useState(true);
 
+  
+
   useEffect(() => {
   fetch(`${API}/api/vehicles/active`, {
     headers: {
@@ -22,15 +24,23 @@ function PricingUI() {
   })
     .then(res => res.json())
     .then(resData => {
-      if (Array.isArray(resData.data)) {
-        setVehicles(resData.data);
-      } else {
-        setVehicles([]);
-      }
-    })
+  console.log("Vehicle API raw:", resData);
+
+  if (Array.isArray(resData.data)) {
+    const activeVehicles = resData.data.filter(v => v.is_active === true);
+
+    setVehicles(activeVehicles);
+  } else {
+    setVehicles([]);
+  }
+})
+
+
     .catch(err => console.error("Vehicle fetch error:", err))
     .finally(() => setVehicleLoading(false));
 }, [API]);
+
+console.log("Vehicles loaded:", vehicles);
 
 
 
@@ -98,6 +108,7 @@ useEffect(() => {
     },
       body: JSON.stringify({
         vehicle_id: selectedVehicle?.id,
+        // vehicle_id: "696f6dfe0fed6268ccc62031",
         distance: parseFloat(distance),
         applySurcharge,
         applyAc
@@ -152,35 +163,52 @@ useEffect(() => {
   </label>
 
   <select
+  
     value={selectedVehicle?.id || ""}
     onChange={e => {
-      const v = vehicles.find(x => x._id === e.target.value);
-      if (!v) return;
+  const v = vehicles.find(
+    x => x._id === e.target.value
+  );
 
-      setSelectedVehicle({
-        id: v._id,
-        name: v.vehicle_type
-      });
-    }}
+  if (!v) return;
+
+
+  setSelectedVehicle({
+    id: v._id,
+    name: v.vehicle_id.vehicle_type
+  });
+}}
+
     style={{
-      padding: "8px",
-      borderRadius: "6px",
-      border: "1px solid #374151",
-      background: "#020617",
-      color: "#e5e7eb",
-      width: "100%"
-    }}
+  padding: "8px",
+  borderRadius: "6px",
+  border: "1px solid #374151",
+  backgroundColor: "#020617",
+  color: "#ffffff",
+  width: "100%",
+  appearance: "none"
+}}
+
   >
-    <option value="">
+    <option value="" disabled>
       {vehicleLoading ? "Loading vehicles..." : "-- Select Vehicle --"}
     </option>
 
     {vehicles.map(v => (
-      <option key={v._id} value={v._id}>
-        {v.vehicle_type}
-      </option>
-    ))}
+  <option
+    key={v._id}
+    value={v._id}
+    style={{ color: "#fff", backgroundColor: "#020617" }}
+  >
+    {v.vehicle_id.vehicle_type}
+  </option>
+))}
+
+
+
   </select>
+
+  
 </div>
 
 
@@ -286,19 +314,22 @@ useEffect(() => {
           {/* Calculate Button */}
           <button
             onClick={fetchPricing}
-            disabled={loading}
+            disabled={loading || !selectedVehicle}
             style={{
-              marginLeft: isMobile ? "0" : "12px",
-              marginTop: isMobile ? "10px" : "0",
-              width: isMobile ? "100%" : "auto",
-              padding: "10px 16px",
-              borderRadius: "8px",
-              border: "none",
-              background: accent,
-              color: "#020617",
-              fontWeight: 600,
-              cursor: "pointer"
-            }}
+  marginLeft: isMobile ? "0" : "12px",
+  marginTop: isMobile ? "10px" : "0",
+  width: isMobile ? "100%" : "auto",
+  padding: "10px 16px",
+  borderRadius: "8px",
+  border: "none",
+  background: accent,
+  color: "#020617",
+  fontWeight: 600,
+  cursor: loading || !selectedVehicle ? "not-allowed" : "pointer",
+  opacity: loading || !selectedVehicle ? 0.5 : 1,
+  filter: loading || !selectedVehicle ? "blur(1px)" : "none",
+  transition: "0.2s ease"
+}}
           >
             {loading ? "Calculating..." : "Calculate"}
           </button>
