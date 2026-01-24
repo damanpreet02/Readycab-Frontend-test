@@ -129,6 +129,9 @@ useEffect(() => {
   };
 
   return (
+
+    
+
     <div style={{
       padding: isMobile ? "10px" : "20px",
       background: "#020617",
